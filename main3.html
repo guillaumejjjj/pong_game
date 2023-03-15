@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pong</title>
+    <style>
+        canvas {
+            display: block;
+            margin: auto;
+            background-color: black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        const paddleWidth = 10;
+        const paddleHeight = 100;
+        const paddleSpeed = 5;
+
+        let leftPaddleY = (canvas.height - paddleHeight) / 2;
+        let rightPaddleY = (canvas.height - paddleHeight) / 2;
+
+        const ballSize = 10;
+        let ballX = canvas.width / 2;
+        let ballY = canvas.height / 2;
+        let ballSpeedX = 4;
+        let ballSpeedY = 2;
+
+        let rightPaddleSpeedY = 0;
+        const KEY_UP_ARROW = 38;
+        const KEY_DOWN_ARROW = 40;
+
+        function drawPaddles() {
+            ctx.fillStyle = "white";
+            ctx.fillRect(0, leftPaddleY, paddleWidth, paddleHeight);
+            ctx.fillRect(canvas.width - paddleWidth, rightPaddleY, paddleWidth, paddleHeight);
+        }
+
+        function drawBall() {
+            ctx.fillStyle = "white";
+            ctx.fillRect(ballX, ballY, ballSize, ballSize);
+        }
+
+        function movePaddles() {
+            // Mueve la paleta izquierda
+            if (leftPaddleY > ballY - paddleHeight / 2 && leftPaddleY > 0) {
+                leftPaddleY -= paddleSpeed;
+            }
+            if (leftPaddleY < ballY - paddleHeight / 2 && leftPaddleY < canvas.height - paddleHeight) {
+                leftPaddleY += paddleSpeed;
+            }
+
+            // Mueve la paleta derecha
+            if (rightPaddleY + rightPaddleSpeedY >= 0 && rightPaddleY + rightPaddleSpeedY <= canvas.height - paddleHeight) {
+                rightPaddleY += rightPaddleSpeedY;
+            }
+        }
+
+        function moveBall() {
+            ballX += ballSpeedX;
+            ballY += ballSpeedY;
+
+            if (ballX <= paddleWidth && ballY > leftPaddleY && ballY < leftPaddleY + paddleHeight) {
+                ballSpeedX = -ballSpeedX;
+            }
+            if (ballX >= canvas.width - paddleWidth - ballSize && ballY > rightPaddleY && ballY < rightPaddleY + paddleHeight) {
+                ballSpeedX = -ballSpeedX;
+            }
+
+            if (ballY <= 0 || ballY >= canvas.height - ballSize) {
+                ballSpeedY = -ballSpeedY;
+            }
+
+            if (ballX < 0 || ballX > canvas.width) {
+                ballX = canvas.width / 2;
+                ballY = canvas.height / 2;
+            }
+        }
+
+        function handleKeydown(evt) {
+            switch (evt.keyCode) {
+                case KEY_UP_ARROW:
+                    rightPaddleSpeedY = -paddleSpeed;
+                    break;
+                    case KEY_DOWN_ARROW:
+                    rightPaddleSpeedY = paddleSpeed;
+                    break;
+            }
+        }
+
+        function handleKeyup(evt) {
+            switch (evt.keyCode) {
+                case KEY_UP_ARROW:
+                case KEY_DOWN_ARROW:
+                    rightPaddleSpeedY = 0;
+                    break;
+            }
+        }
+
+        document.addEventListener("keydown", handleKeydown);
+        document.addEventListener("keyup", handleKeyup);
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawPaddles();
+            drawBall();
+            movePaddles();
+            moveBall();
+        }
+
+        setInterval(draw, 1000 / 60);
+    </script>
+</body>
+</html>
+
